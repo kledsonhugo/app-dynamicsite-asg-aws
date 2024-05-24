@@ -34,22 +34,23 @@ A solução contempla os seguintes serviços e recursos da AWS:
 
 A solução contém três tabelas de roteamento:
 
+![Tabelas de roteamento](./images/rotas.jpg)
+
 **rt-pub**: Associada às duas sub-redes públicas. Contém uma rota direta para a Internet através do Internet Gateway, o que significa que os recursos dessa sub-rede podem acessar a internet diretamente.
 
 **rt-priv-az1a**: Esta é a tabela de roteamento da sub-rede privada na Zona de Disponibilidade **1a**. Contém uma rota para a Internet através do NAT Gateway localizado na mesma Zona de Disponibilidade, o que significa que os recursos nessa sub-rede podem acessar a Internet apenas com um NAT, mas não podem ser acessados diretamente da internet.
 
 **rt-priv-az1c**: Esta é a tabela de roteamento da sub-rede privada na Zona de Disponibilidade **1c**. Contém uma rota para a Internet através do NAT Gateway localizado na mesma Zona de Disponibilidade, o que significa que os recursos nessa sub-rede podem acessar a Internet apenas com um NAT, mas não podem ser acessados diretamente da internet.
 
-
 > :warning: **Aviso:** Cada tabela de roteamento deve ser associada a sub-redes específicas através de associações de tabela de roteamento. Por exemplo, a tabela de roteamento rt-pub deve ser associada às sub-redes sn-pub-az1a e sn-pub-az1c. As tabelas de roteamento privadas rt-priv-az1a e rt-priv-az1c devem ser associadas às sub-redes sn-priv-az1a e sn-priv-az1c respectivamente.
 
 Em resumo, as tabelas de roteamento definem como o tráfego de rede é direcionado. As tabelas de roteamento públicas permitem que os recursos acessem a internet diretamente, enquanto as tabelas de roteamento privadas permitem que os recursos acessem a internet através de um gateway NAT, protegendo-os de acesso direto da internet.
 
-![Tabelas de roteamento](./images/rotas.jpg)
-
 ## Grupos de segurança
 
 A solução define dois Security Groups:
+
+![Desenho da solução](./images/firewall.jpg)
 
 **sg-elb**: Security Group para o Elastic Load Balancer (ELB). Ele permite todo o tráfego de saída (egress) e permite tráfego de entrada (ingress) na porta 80 (usada para tráfego HTTP) de qualquer endereço IP (0.0.0.0/0).
 
@@ -58,18 +59,14 @@ A solução define dois Security Groups:
 Detalhes de cada regra:
 
 **egress**: Esta regra permite todo o tráfego de saída.
-- from_port = 0 e to_port = 0 significa que todas as portas estão abertas.
-- protocol = -1 significa que todos os protocolos estão permitidos.
-- cidr_blocks = ["0.0.0.0/0"] significa que o tráfego pode ser destinado a qualquer endereço IP.
+- **from_port = 0** e **to_port = 0**: significa que todas as portas estão abertas.
+- **protocol = -1**: significa que todos os protocolos estão permitidos.
+- **cidr_blocks = ["0.0.0.0/0"]**: significa que o tráfego pode ser destinado a qualquer endereço IP.
 
 **ingress**: Esta regra permite o tráfego de entrada.
-- No sg-elb, from_port = 80 e to_port = 80 significa que apenas a porta 80 está aberta
-- protocol = "tcp" significa que apenas o protocolo TCP está permitido.
-- cidr_blocks = ["0.0.0.0/0"] significa que o tráfego pode vir de qualquer endereço IP. 
+- No sg-elb, **from_port = 80** e **to_port = 80**: significa que apenas a porta 80 está aberta.
+- **protocol = "tcp"**: significa que apenas o protocolo TCP está permitido.
+- **cidr_blocks = ["0.0.0.0/0"]**: significa que o tráfego pode vir de qualquer endereço IP. 
 - No sg-ec2, todas as portas e protocolos estão abertos, mas apenas para endereços IP na faixa 10.0.0.0/16.
 
-Em resumo, os Security Groups atuam como um firewall no nível da instância, controlando o tráfego de entrada e saída para as instâncias EC2 e outros recursos na AWS.
-
-As regras de egress permitem que os recursos enviem tráfego para vários endereços IP, enquanto as regras de ingress controlam de onde esses recursos podem receber tráfego.
-
-![Desenho da solução](./images/firewall.jpg)
+Em resumo, os Security Groups atuam como um firewall no nível da instância, controlando o tráfego de entrada e saída para as instâncias EC2 e outros recursos na AWS. As regras de egress permitem que os recursos enviem tráfego para vários endereços IP, enquanto as regras de ingress controlam de onde esses recursos podem receber tráfego.
