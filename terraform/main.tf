@@ -123,25 +123,25 @@ resource "aws_security_group" "sg-ec2" {
   }
 }
 
-resource "aws_lb_listener" "ec2-lb-listener" {
+resource "aws_lb_listener" "ec2-elb-listener" {
   protocol          = "HTTP"
   port              = 80
-  load_balancer_arn = aws_lb.ec2-lb.arn
+  load_balancer_arn = aws_lb.ec2-elb.arn
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.ec2-lb-tg.arn
+    target_group_arn = aws_lb_target_group.ec2-elb-tg.arn
   }
 }
 
-resource "aws_lb" "ec2-lb" {
-  name               = "ec2-lb"
+resource "aws_lb" "ec2-elb" {
+  name               = "ec2-elb"
   load_balancer_type = "application"
   subnets            = [aws_subnet.sn-pub-az1a.id, aws_subnet.sn-pub-az1c.id]
   security_groups    = [aws_security_group.sg-elb.id]
 }
 
-resource "aws_lb_target_group" "ec2-lb-tg" {
-  name     = "ec2-lb-tg"
+resource "aws_lb_target_group" "ec2-elb-tg" {
+  name     = "ec2-elb-tg"
   protocol = "HTTP"
   port     = 80
   vpc_id   = aws_vpc.vpc.id
@@ -166,7 +166,7 @@ resource "aws_autoscaling_group" "ec2-asg" {
   min_size            = 2
   max_size            = 8
   vpc_zone_identifier = [aws_subnet.sn-priv-az1a.id, aws_subnet.sn-priv-az1c.id]
-  target_group_arns   = [aws_lb_target_group.ec2-lb-tg.arn]
+  target_group_arns   = [aws_lb_target_group.ec2-elb-tg.arn]
   launch_template {
     id      = aws_launch_template.ec2-lt.id
     version = "$Latest"
