@@ -60,7 +60,7 @@ data "template_file" "userdata" {
 
 resource "aws_launch_template" "ec2-lt" {
   name_prefix            = "app-dynamicsite"
-  image_id               = "ami-02e136e904f3da870"
+  image_id               = var.ec2_ami
   instance_type          = "t2.micro"
   key_name               = "vockey"
   user_data              = base64encode(data.template_file.userdata.rendered)
