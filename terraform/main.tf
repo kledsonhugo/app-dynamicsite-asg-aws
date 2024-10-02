@@ -12,5 +12,4 @@ module "compute" {
   sn_pub_az1c_id  = module.network.sn_pub_az1c_id
   sn_priv_az1a_id = module.network.sn_priv_az1a_id
   sn_priv_az1c_id = module.network.sn_priv_az1c_id
-  ec2_ami         = "051f8a213df8bc089"
 }
